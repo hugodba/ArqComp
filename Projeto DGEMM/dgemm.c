@@ -1,20 +1,21 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 #include "dgemm.h"
 
 int main (void) {
 
     printf ("\ncomeco\n");
-    int n = 1024;
+    int n = 2048;
+    int aux1, aux2, aux3, aux4;
     
-    double A [n*n];
-    double B [n*n];
-    double C [n*n];
+    double *A = malloc (n * n * sizeof (double));
+    double *B = malloc (n * n * sizeof (double));
+    double *C = malloc (n * n * sizeof (double));
 
     clock_t start, end;
     double cpu_time_used;
 
-    printf ("\ndebug1");
 /*
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
@@ -29,6 +30,9 @@ int main (void) {
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     printf ("\nCPU time: %f\n", cpu_time_used);
-
+    
+    free (A);
+    free (B);
+    free (C);
     return 0;
 }
