@@ -1,5 +1,7 @@
 #include <x86intrin.h>
 #include <omp.h>
+#include <time.h>
+#include <stdio.h>
 
 #define UNROLL    4
 #define BLOCKSIZE 32
@@ -28,11 +30,6 @@ double *criar_matriz (int n) {
   double *matriz = malloc (n * n * sizeof (double));
   rand_matrix (n, matriz, 0, 1000);
   return matriz;
-}
-
-void free_matrizes (double *, double *, double *);
-void free_matrizes (double *A, double *B, double *C) {
-  free (A); free (B); free (C);
 }
 
 void dgemm_1 (int, double *, double *, double *);
@@ -136,4 +133,70 @@ void dgemm_6 (int n, double* A, double* B, double* C) {
     for ( int si = 0; si < n; si += BLOCKSIZE )
       for ( int sk = 0; sk < n; sk += BLOCKSIZE )
         do_block_2 (n, si, sj, sk, A, B, C);
+}
+
+double executar_dgemm (int, int, int, double *, double *, double *);
+double executar_dgemm (int n, int times, int algorithm, double *A, double *B, double *C) {
+  clock_t start, end;
+  double cpu_time_used;
+  double aux = 0;
+
+  for (int i = 0; i < times; i++) {
+    switch (algorithm) {
+      case 1:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_1 (%ix)", times);
+        start = clock();
+        dgemm_1 (n, A, B, C);
+        end = clock();
+      break;
+
+      case 2:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_AVX (%ix)", times);
+        start = clock();
+        dgemm_2 (n, A, B, C);
+        end = clock();
+      break;
+      
+      case 3:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_AVX_UNROLL (%ix)", times);
+        start = clock();
+        dgemm_3 (n, A, B, C);
+        end = clock();
+      break;
+
+      case 4:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_BLOCK_1 (%ix)", times);
+        start = clock();
+        dgemm_4 (n, A, B, C);
+        end = clock();
+      break;
+
+      case 5:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_AVX_UNROLL_BLOCK_2 (%ix)", times);
+        start = clock();
+        dgemm_5 (n, A, B, C);
+        end = clock();
+      break;
+
+      case 6:
+        if (!aux)
+          printf ("\n\nExecutando DGEMM_AVX_UNROLL_BLOCK_2_PARALLEL (%ix)", times);
+        start = clock();
+        dgemm_6 (n, A, B, C);
+        end = clock();
+      break;
+    }
+    
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    aux += cpu_time_used;
+    
+    printf ("\nCPU time %i: %f sec", i + 1, cpu_time_used);
+  }
+
+  return aux/times;
 }
