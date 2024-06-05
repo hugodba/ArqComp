@@ -37,7 +37,6 @@ void create_matrix(double *A){
 }
 
 int main(){
-    int i,j;
     double *A=NULL,*B=NULL,*C=NULL;
 
     LARGE_INTEGER frequency;

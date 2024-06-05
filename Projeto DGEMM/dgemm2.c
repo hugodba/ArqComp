@@ -2,7 +2,7 @@
 #include <windows.h>
 
 
-#define N 2000
+#define N 1000
 
 
 void mult (double* A, double* B, double* C){
@@ -30,7 +30,6 @@ void create_matrix(double *A){
 }
 
 int main(){
-  int i,j;
   double *A=NULL,*B=NULL,*C=NULL;
 
   LARGE_INTEGER frequency;
